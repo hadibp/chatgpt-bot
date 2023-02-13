@@ -10,7 +10,7 @@ class OpenApiService {
   static String baseURL = 'https://api.openai.com/v1/completions';
   static bool isLoading = false;
   static Map<String, String> header = {
-    "Content-Type": "application/json; charset=UTF-8",
+    "Content-Type": "application/json",
     "Authorization": "Bearer $hadiskey"
   };
 

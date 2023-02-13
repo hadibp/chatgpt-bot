@@ -11,7 +11,7 @@ import 'package:speech_to_text/speech_to_text.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
- 
+
   @override
   State<HomePage> createState() => _HomePageState();
 }
@@ -29,7 +29,7 @@ class _HomePageState extends State<HomePage> {
 
   scrollmethod() {
     scrolcontroller.animateTo(scrolcontroller.position.maxScrollExtent,
-        duration:const Duration(microseconds: 300), curve: Curves.easeInOut);
+        duration: const Duration(microseconds: 300), curve: Curves.easeInOut);
   }
 
   @override
@@ -47,7 +47,6 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
         children: [
           Expanded(
               child: Padding(
@@ -57,10 +56,11 @@ class _HomePageState extends State<HomePage> {
                 physics: const BouncingScrollPhysics(),
                 controller: scrolcontroller,
                 shrinkWrap: true,
+                reverse: true,
                 itemBuilder: (BuildContext context, int index) {
-                  final ChatMessage chat = messages[index];
+                  final ChatMessage chat = messages[messages.length -1-index];
                   return OpenApiService.isLoading
-                      ? CircularProgressIndicator()
+                      ? const CircularProgressIndicator()
                       : chatBubble(
                           context: context,
                           chattext: chat.text,
@@ -91,6 +91,8 @@ class _HomePageState extends State<HomePage> {
                           borderRadius: BorderRadius.circular(19.0)),
                       child: TextField(
                         controller: controller,
+                        keyboardType: TextInputType.multiline,
+                        maxLines: null,
                         decoration: const InputDecoration(
                           border: InputBorder.none,
                           hintText: 'Ask Me Anything...',
@@ -113,7 +115,7 @@ class _HomePageState extends State<HomePage> {
                                 type: ChatMessageType.user));
                             var response = await OpenApiService.sendMessage(
                                 controller.value.text);
-                                  response = response.trim();
+                            response = response.trim();
 
                             print('reponse = $response');
                             TextToSpeech.speak(response);
@@ -137,8 +139,8 @@ class _HomePageState extends State<HomePage> {
                       child: AvatarGlow(
                         endRadius: 100.0,
                         animate: isListening,
-                        duration: Duration(microseconds: 2000),
-                        repeatPauseDuration: Duration(microseconds: 00),
+                        duration: const Duration(microseconds: 2000),
+                        repeatPauseDuration: const Duration(microseconds: 00),
                         glowColor: ColorConstants.thirddarkcolor,
                         showTwoGlows: true,
                         repeat: true,
@@ -148,7 +150,7 @@ class _HomePageState extends State<HomePage> {
                               bool isrecording =
                                   await speechToText.initialize();
                               if (isrecording) {
-                                print('recoring');
+                                print('recording');
                                 setState(() {
                                   isListening = true;
                                   speechToText.listen(
@@ -166,7 +168,6 @@ class _HomePageState extends State<HomePage> {
                           },
                           onTapUp: (result) async {
                             print('done');
-
                             setState(() {
                               isListening = false;
                             });
@@ -176,7 +177,7 @@ class _HomePageState extends State<HomePage> {
                                   text: voicetext, type: ChatMessageType.user));
                               var voiceresponse =
                                   await OpenApiService.sendMessage(voicetext);
-                                  voiceresponse = voiceresponse.trim();
+                              voiceresponse = voiceresponse.trim();
 
                               setState(() {
                                 messages.add(ChatMessage(
@@ -188,13 +189,15 @@ class _HomePageState extends State<HomePage> {
                                 TextToSpeech.speak(voiceresponse);
                               });
                             } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content: Text(
-                                          'say somthing or unable to process')));
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text(
+                                            'say somthing or unable to process')));
+                              }
                             }
                           },
-                          child: CircleAvatar(
+                          child: const CircleAvatar(
                             // radius: 25.0,
                             backgroundColor: ColorConstants.thirddarkcolor,
                             child: Icon(
